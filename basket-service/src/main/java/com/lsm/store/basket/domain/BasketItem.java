@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data @Builder @EqualsAndHashCode(of = "productId")
-public class BasketItem {
+public class BasketItem implements Comparable<BasketItem> {
 
 //	private String id;
     
@@ -45,6 +45,11 @@ public class BasketItem {
 	
 	public BigDecimal getItemValue() {
 		return unitPrice.multiply(new BigDecimal(quantity));
+	}
+
+	@Override
+	public int compareTo(BasketItem o) {
+		return productId.compareTo(o.getProductId());
 	}
 	
 }

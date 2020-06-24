@@ -1,3 +1,5 @@
-**/target
-**/node_modules
+target/
+node_modules/
+.settings/
 docker-volumes/**
+/.project

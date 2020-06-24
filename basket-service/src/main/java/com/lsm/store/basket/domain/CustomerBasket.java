@@ -3,8 +3,8 @@ package com.lsm.store.basket.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -26,7 +26,7 @@ public class CustomerBasket implements Serializable {
 	private Date createdAt;
 	
 	@Builder.Default
-    private Set<BasketItem> items = new HashSet<BasketItem>();
+    private SortedSet<BasketItem> items = new TreeSet<BasketItem>();
 	
 	public static CustomerBasket newInstance() {
 
@@ -54,7 +54,7 @@ public class CustomerBasket implements Serializable {
 
 	public void addItem(BasketItem item) {
 		if(items == null)
-			items = new HashSet<BasketItem>();
+			items = new TreeSet<BasketItem>();
 		items.remove(item);//add not override on add
 		items.add(item);		
 	}
