@@ -1,0 +1,327 @@
+swagger: "2.0"
+info:
+  description: "This is a Sample Store Catalog API"
+  version: "1.0.0"
+  title: "Sample Store Catalog"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:9082"
+basePath: "/catalog"
+# tags:
+# - name: "pet"
+#   description: "Everything about your Pets"
+#   externalDocs:
+#     description: "Find out more"
+#     url: "http://swagger.io"
+# - name: "store"
+#   description: "Access to Petstore orders"
+# - name: "user"
+#   description: "Operations about user"
+#   externalDocs:
+#     description: "Find out more about our store"
+#     url: "http://swagger.io"
+schemes:
+# - "https"
+- "http"
+paths:
+  /product:
+    get:
+      tags:
+      - "Products"
+      summary: "Find catalog products"
+      description: "List products of catalog with filter and paggination"
+      operationId: "listProducts"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/page"
+      - $ref: "#/parameters/size"
+      - $ref: "#/parameters/query"
+
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PagedProducts"
+  /product/{id}:
+    get:
+      tags:
+      - "Products"
+      summary: "Find catalog product"
+      description: "List product of catalog"
+      operationId: "findProductById"
+      produces:
+     # - "application/xml"
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/objectIdPath"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Product"
+        "404":
+          description: "brand not found"
+  /brand:
+    get:
+      tags:
+      - "Brands"
+      summary: "Find catalog brands"
+      description: "List brands of catalog with filter and paggination"
+      operationId: "listBrands"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/page"
+      - $ref: "#/parameters/size"
+      - $ref: "#/parameters/query"
+
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PagedBrands"
+  /brand/{id}:
+    get:
+      tags:
+      - "Brands"
+      summary: "Find catalog brands"
+      description: "List brands of catalog with filter and paggination"
+      operationId: "findBrandById"
+      produces:
+     # - "application/xml"
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/objectIdPath"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Brand"
+        "404":
+          description: "brand not found"
+  /brand/{id}/product:
+    get:
+      tags:
+      - "Brands"
+      - "Products"
+      summary: "Get products by brand with paged result"
+      description: "Get products by brand with paged result"
+      operationId: "findBrandProducts"
+      produces:
+     # - "application/xml"
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/objectIdPath"
+      - $ref: "#/parameters/page"
+      - $ref: "#/parameters/size"
+      - $ref: "#/parameters/query"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PagedProducts"
+        "404":
+          description: "brand not found"
+  /type:
+    get:
+      tags:
+      - "Types"
+      summary: "Find catalog types"
+      description: "List types of catalog with filter and paggination"
+      operationId: "listTypes"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/page"
+      - $ref: "#/parameters/size"
+      - $ref: "#/parameters/query"
+
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PagedTypes"
+  /type/{id}:
+    get:
+      tags:
+      - "Types"
+      summary: "Find catalog types"
+      description: "List types of catalog with filter and paggination"
+      operationId: "findTypeById"
+      produces:
+     # - "application/xml"
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/objectIdPath"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Type"
+  /type/{id}/product:
+    get:
+      tags:
+      - "Types"
+      - "Products"
+      summary: "Get products by type with paged result"
+      description: "Get products by type with paged result"
+      operationId: "findTypeProducts"
+      produces:
+     # - "application/xml"
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/objectIdPath"
+      - $ref: "#/parameters/page"
+      - $ref: "#/parameters/size"
+      - $ref: "#/parameters/query"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PagedProducts"
+definitions:
+  Brand:
+    type: "object"
+    properties: 
+      id:
+        type: "string"
+      brand:
+        type: "string"
+  Product:
+    type: "object"
+    properties: 
+      id:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      price:
+        type: "string"
+      pictureUri:
+        type: "string"
+      brand:
+        $ref: "#/definitions/Brand"
+      type:
+        $ref: "#/definitions/Type"
+      availableStock:
+        type: "integer"
+  Type:
+    type: "object"
+    properties: 
+      id:
+        type: "string"
+      type:
+        type: "string"
+  PagedResponse:
+    type: "object"
+    properties:
+      content:
+        type: "object"
+      pageable:
+        type: "object"
+        properties:
+          pageNumber:
+            type: "integer"
+          pageSize:
+            type: "integer"
+          offset:
+            type: "integer"
+          unpaged:
+            type: "boolean"
+          paged:
+            type: "boolean"
+          sort:
+            properties:
+              sorted:
+                type: "boolean"
+              unsorted:
+                type: "boolean"
+              empty:
+                type: "boolean"
+      sort:
+        properties:
+          sorted:
+            type: "boolean"
+          unsorted:
+            type: "boolean"
+          empty:
+            type: "boolean"
+      totalPages:
+        type: "integer"
+      totalElements:
+        type: "integer"
+      last:
+        type: "boolean"
+      first:
+        type: "boolean"
+      numberOfElements:
+        type: "integer"
+      size:
+        type: "integer"
+      number:
+        type: "integer"
+      empty:
+        type: "boolean"
+  PagedBrands:
+    allOf:
+      - $ref: "#/definitions/PagedResponse"
+      - type: "object"
+        properties:
+          content:
+            type: array
+            items:
+              $ref: "#/definitions/Brand"
+  PagedTypes:
+    allOf:
+      - $ref: "#/definitions/PagedResponse"
+      - type: "object"
+        properties:
+          content:
+            type: array
+            items:
+              $ref: "#/definitions/Type"
+  PagedProducts:
+    allOf:
+      - $ref: "#/definitions/PagedResponse"
+      - type: "object"
+        properties:
+          content:
+            type: array
+            items:
+              $ref: "#/definitions/Product"
+parameters:
+  objectIdPath:
+    name: "id"
+    in: "path"
+    required: true
+    description: "Object Id"
+    type: "string"
+  page:
+    name: "page"
+    in: "query"
+    description: "result page number"
+    required: false
+    type: "integer"
+    default: 0
+  size:
+    name: "size"
+    in: "query"
+    description: "result per page"
+    required: false
+    type: "integer"
+    default: 20
+  query:
+    name: "q"
+    in: "query"
+    description: "text to search. Like a google search"
+    required: false
+    type: "string"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

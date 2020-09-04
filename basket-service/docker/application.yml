@@ -1,0 +1,7 @@
+server:
+  port: 8090
+spring:
+  redis:
+    client-name: basket-service
+    url: ${REDIS_URI}
+    #url: redis://user:password@localhost:6379

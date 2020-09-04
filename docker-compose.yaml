@@ -47,6 +47,139 @@ services:
       - redis
     networks:
       - store-network
+      
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-7.7.0}
+    container_name: elasticsearch
+    restart: always
+    volumes:
+      - ./docker-volumes/elasticsearch/data:/usr/share/elasticsearch/data
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - xpack.security.enabled=false
+      - xpack.monitoring.enabled=false
+      - cluster.name=elasticsearch
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile: 65536
+    networks:
+      - store-network
+  gio_gateway:
+    image: graviteeio/apim-gateway:${APIM_VERSION:-3}
+    container_name: gio_gateway
+    restart: always
+    ports:
+      - "9082:8082"
+    depends_on:
+      - mongodb
+      - elasticsearch
+    volumes:
+      - ./docker-volumes/apim-gateway/logs:/opt/graviteeio-gateway/logs
+    environment:
+      - gravitee_management_mongodb_uri=mongodb://root:root@mongodb:27017/gravitee?authSource=admin&serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      - gravitee_ratelimit_mongodb_uri=mongodb://root:root@mongodb:27017/gravitee?authSource=admin&serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      - gravitee_reporters_elasticsearch_endpoints_0=http://elasticsearch:9200
+      - gravitee_tags=
+    links:
+      - mongodb
+    networks:
+      - store-network
+
+  gio_management_api:
+    image: graviteeio/apim-management-api:${APIM_VERSION:-3}
+    container_name: gio_management_api
+    restart: always
+    ports:
+      - "9083:8083"
+    links:
+      - mongodb
+      - elasticsearch
+    depends_on:
+      - mongodb
+      - elasticsearch
+    volumes:
+      - ./docker-volumes/apim-management/logs:/opt/graviteeio-management-api/logs
+    environment:
+      - gravitee_management_mongodb_uri=mongodb://root:root@mongodb:27017/gravitee?authSource=admin&serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      - gravitee_analytics_elasticsearch_endpoints_0=http://elasticsearch:9200
+    links:
+      - mongodb
+    networks:
+      - store-network
+
+  gio_management_ui:
+    image: graviteeio/apim-management-ui:${APIM_VERSION:-3}
+    container_name: gio_management_ui
+    restart: always
+    ports:
+      - "9084:8080"
+    depends_on:
+      - gio_management_api
+    environment:
+      - MGMT_API_URL=http://localhost:9083/management/organizations/DEFAULT/environments/DEFAULT/
+    volumes:
+      - ./logs/apim-management-ui:/var/log/nginx
+    networks:
+      - store-network
+
+  gio_portal_ui:
+    image: graviteeio/apim-portal-ui:${APIM_VERSION:-3}
+    container_name: gio_apim_portal_ui
+    restart: always
+    ports:
+      - "9085:8080"
+    depends_on:
+      - gio_management_api
+    environment:
+      - PORTAL_API_URL=http://localhost:9083/portal/environments/DEFAULT
+    volumes:
+      - ./logs/apim-portal-ui:/var/log/nginx
+    networks:
+      - store-network
+      
+  store-catalog:
+    image: store-sample/catalog-service:0.0.1
+    build: ./catalog-service
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    environment:
+    - MONGO_HOST=mongodb
+    - MONGO_PORT=27017
+    - MONGO_AUTHDB=admin
+    - MONGO_DATABASE=catalog
+    - MONGO_USERNAME=root
+    - MONGO_PASSWORD=root
+    volumes:
+      - ./catalog-service/docker:/config
+    links:
+      - mongodb  
+    networks:
+      - store-network
+      
+  store-basket:
+    image: store-sample/basket-service:0.0.1
+    build: ./basket-service
+    restart: always
+    ports:
+      - "8090:8090"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_URI=redis://redis:6379
+    volumes:
+      - ./basket-service/docker:/config
+    networks:
+      - store-network
+      
 networks: 
     store-network:
       driver: bridge

@@ -15,7 +15,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data @Builder @RedisHash("basket") @NoArgsConstructor @AllArgsConstructor
+@Data @Builder @RedisHash(value="basket", timeToLive = 300) @NoArgsConstructor @AllArgsConstructor
 public class CustomerBasket implements Serializable {
 	
 	private static final long serialVersionUID = 1L;

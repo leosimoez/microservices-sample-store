@@ -1,0 +1,168 @@
+swagger: "2.0"
+info:
+  description: "This is a Sample Store Catalog API"
+  version: "1.0.0"
+  title: "Sample Store Catalog"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "sample-store.com"
+basePath: "/v1"
+schemes:
+- "https"
+- "http"
+paths:
+  /basket/{id}:
+    get:
+      tags:
+      - "Basket"
+      summary: "Find catalog product"
+      description: "List product of catalog"
+      operationId: "findBasket"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/objectIdPath"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Basket"
+        "404":
+          description: "brand not found"
+      security:
+      - store_auth:
+        - "Catalog.Read"
+    post:
+      tags:
+      - "Basket"
+      summary: "Find catalog brands"
+      description: "List brands of catalog with filter and paggination"
+      operationId: "createBasket"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/objectIdPath"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Basket"
+      security:
+      - store_auth:
+        - "Catalog.Read"
+    delete:
+      tags:
+      - "Basket"
+      summary: "Find catalog brands"
+      description: "List brands of catalog with filter and paggination"
+      operationId: "deleteBasket"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/objectIdPath"
+      responses:
+        "204":
+          description: "successful operation"
+      security:
+      - store_auth:
+        - "Catalog.Read"
+  /basket/{id}/item:
+    post:
+      tags:
+      - "Basket"
+      summary: "Find catalog brands"
+      description: "List brands of catalog with filter and paggination"
+      operationId: "addItem"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/objectIdPath"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Basket"
+      security:
+      - store_auth:
+        - "Catalog.Read"
+  /basket/{id}/item/{productId}:
+    delete:
+      tags:
+      - "Basket"
+      summary: "Find catalog brands"
+      description: "List brands of catalog with filter and paggination"
+      operationId: "removeItem"
+      produces:
+      - "application/json"
+      parameters:
+      - $ref: "#/parameters/objectIdPath"
+      - $ref: "#/parameters/productIdPath"
+      responses:
+        "204":
+          description: "successful operation"
+      security:
+      - store_auth:
+        - "Catalog.Read"
+securityDefinitions:
+  store_auth:
+    type: "oauth2"
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      Catalog.Read: "read products, brands and categories"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Basket:
+    type: "object"
+    properties: 
+      id:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      price:
+        type: "string"
+      pictureUri:
+        type: "string"
+      items:
+        type: "array"
+        items:
+          $ref: "#/definitions/BasketItem"
+
+  BasketItem:
+    type: "object"
+    properties: 
+      productId:
+        type: "string"
+      productName:
+        type: "string"
+      pictureUri:
+        type: "string"
+      quantity:
+        type: "integer"
+      unitPrice:
+        type: "number"
+parameters:
+  objectIdPath:
+    name: "id"
+    in: "path"
+    required: true
+    description: "Object Id"
+    type: "string"
+  productIdPath:
+    name: "productId"
+    in: "path"
+    required: true
+    description: "Product Id"
+    type: "string"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
